@@ -8,6 +8,10 @@
 #include <string>
 #include <sstream>
 
+/**
+ * @class OffsetToTarget
+ * @brief Simple class to store offset information.
+ */
 class OffsetToTarget {
   public:
     double x_;
