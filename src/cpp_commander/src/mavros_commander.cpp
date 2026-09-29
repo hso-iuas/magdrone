@@ -13,7 +13,7 @@ MavrosCommander::MavrosCommander(std::shared_ptr<DroneControl> drone_control,
     : drone_control_(drone_control),
       magnet_client_(magnet_client),
       node_(node),
-      cmdQueue_(drone_control_, "MavrosCommander") {
+      cmd_queue_(drone_control_, "MavrosCommander") {
 
     init_services();
 
@@ -24,7 +24,7 @@ MavrosCommander::MavrosCommander(std::shared_ptr<DroneControl> drone_control,
 }
 
 void MavrosCommander::command_loop() {
-    cmdQueue_.exec();
+    cmd_queue_.exec();
 }
 
 void MavrosCommander::init_services(){
@@ -34,7 +34,7 @@ void MavrosCommander::init_services(){
                std::shared_ptr<custom_services::srv::LandTarget::Response> response) {
 
             auto offset = std::make_shared<OffsetToTarget>(0, 0, 0, 0, 0);
-            this->cmdQueue_.add_command(std::make_shared<GotoCommand>(
+            this->cmd_queue_.add_command(std::make_shared<GotoCommand>(
                 std::make_shared<MagnetDockAtTargetCommandQueue>(
                       this->drone_control_,
                       this->magnet_client_,
@@ -60,7 +60,7 @@ void MavrosCommander::init_services(){
                std::shared_ptr<custom_services::srv::Takedown::Response> response) {
 
             auto offset = std::make_shared<OffsetToTarget>(0, 0, 0, 0, 0);
-            this->cmdQueue_.add_command(std::make_shared<GotoCommand>(
+            this->cmd_queue_.add_command(std::make_shared<GotoCommand>(
                 std::make_shared<MagnetDetachCommandQueue>(
                       this->drone_control_,
                       this->magnet_client_,
