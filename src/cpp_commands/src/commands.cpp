@@ -61,8 +61,7 @@ GotoCommand::GotoCommand(
     const int step_on_running,
     const int step_on_error,
     const bool cancel_on_error,
-    const bool treat_failure_as_error,
-    const bool is_return_statement)
+    const bool treat_failure_as_error)
     	: command_(command),
 		name_(name),
         step_on_complete_(step_on_complete),
@@ -70,16 +69,12 @@ GotoCommand::GotoCommand(
         step_on_running_(step_on_running),
         step_on_error_(step_on_error),
         cancel_on_error_(cancel_on_error),
-        treat_failure_as_error_(treat_failure_as_error),
-        is_return_statement_(is_return_statement) {}
+        treat_failure_as_error_(treat_failure_as_error) {}
 
 Command::Result GotoCommand::exec(){
 	return command_->exec();
 }
 
-/*
- CommandQueue added by Valentin Werner
- */
 CommandQueue::CommandQueue(
     std::shared_ptr<DroneControl> drone_control,
 	std::string name,
@@ -147,9 +142,6 @@ void CommandQueue::add_command(std::shared_ptr<GotoCommand> command){
 	command_sequence_.emplace_back(command);
 }
 
-/*
- ArmCommand added by Valentin Werner
- */
 ArmCommand::ArmCommand(
     std::shared_ptr<DroneControl> drone_control,
     bool arm)
@@ -169,9 +161,6 @@ Command::Result ArmCommand::exec(){
   else {return Command::Result::Running;}
 }
 
-/*
- MagnetCommand added by Valentin Werner
- */
 MagnetCommand::MagnetCommand(
     std::shared_ptr<DroneControl> drone_control,
     std::shared_ptr<MagnetServiceClient> magnet_client,
@@ -186,9 +175,6 @@ Command::Result MagnetCommand::exec(){
   else {return Command::Result::Running;}
 }
 
-/*
- IsInAirCommand added by Valentin Werner
- */
 IsInAirCommand::IsInAirCommand(
 	std::shared_ptr<DroneControl> drone_control)
 		: drone_control_(drone_control) {}
@@ -222,12 +208,12 @@ Command::Result CalculateOffsetTf2Command::exec(){
     geometry_msgs::msg::TransformStamped t_magnet;
     try {
         t_center_of_drone = tf_buffer_->lookupTransform(
-          	"magdrone",
+          	"drone_center",
 			target_frame_,
             tf2::TimePointZero);
 
         t_magnet = tf_buffer_->lookupTransform(
-            "magnetTip",
+            "magnet_tip",
             target_frame_,
             tf2::TimePointZero);
 
@@ -236,20 +222,20 @@ Command::Result CalculateOffsetTf2Command::exec(){
 	    rclcpp::Time transform_time = t_center_of_drone.header.stamp;
         double age_seconds = (now - transform_time).seconds();
         if (age_seconds > max_age_seconds_) {
-            RCLCPP_WARN(drone_control_->get_logger(), "CalculateOffsetToMarkerCommand: Transform is too old! Age: %.2fs", age_seconds);
+            RCLCPP_WARN(drone_control_->get_logger(), "CalculateOffsetTf2Command: Transform is too old! Age: %.2fs", age_seconds);
             return Command::Result::Failure;
         }
 
         offset_to_target_->x_ = t_center_of_drone.transform.translation.x;
         offset_to_target_->y_ = t_center_of_drone.transform.translation.y;
         offset_to_target_->z_ = t_magnet.transform.translation.z; // z dist to magnet
-        offset_to_target_->yaw_ = 0.f;
-        offset_to_target_->yaw_rate_ = 0.f;
+        offset_to_target_->yaw_ = 0.f; // is ignored
+        offset_to_target_->yaw_rate_ = 0.f; // is ignored
 
         return Command::Result::Complete;
 
     } catch (const tf2::TransformException & ex) {
-        RCLCPP_WARN(drone_control_->get_logger(), "CalculateOffsetToMarkerCommand: Could not transform magnetTip to marker_42: %s", ex.what());
+        RCLCPP_WARN(drone_control_->get_logger(), "CalculateOffsetTf2Command: Could not transform magnet_tip to marker_42: %s", ex.what());
         return Command::Result::Error;
     }
 }
@@ -288,8 +274,8 @@ Command::Result CalculateOffsetToGlobalPoseCommand::exec() {
     offset_to_target_->y_ = drone_to_target.getOrigin().y();
     offset_to_target_->z_ = drone_to_target.getOrigin().z();
 
-    offset_to_target_->yaw_ = 0.0f;
-    offset_to_target_->yaw_rate_ = 0.0f;
+    offset_to_target_->yaw_ = 0.0f; // is ignored
+    offset_to_target_->yaw_rate_ = 0.0f; // is ignored
 
     return Command::Result::Complete;
 }
@@ -336,7 +322,7 @@ Command::Result CreateGlobalTargetCommand::exec() {
     return Command::Result::Complete;
 }
 
-GoRelativToTargetCommand::GoRelativToTargetCommand(
+GoRelativeToTargetCommand::GoRelativeToTargetCommand(
     std::shared_ptr<DroneControl> drone_control,
     std::shared_ptr<CalculateOffsetToTargetCommand> targeter,
     std::shared_ptr<OffsetToTarget> desired_offset_to_target,
@@ -353,7 +339,7 @@ GoRelativToTargetCommand::GoRelativToTargetCommand(
     	x_type_(x_type), y_type_(y_type), z_type_(z_type), yaw_type_(yaw_type), yaw_rate_type_(yaw_rate_type),
         use_vel_controller_(use_vel_controller){}
 
-Command::Result GoRelativToTargetCommand::exec(){
+Command::Result GoRelativeToTargetCommand::exec(){
 
 	// in control?
   	if(!drone_control_->in_control()) {
@@ -401,7 +387,7 @@ Command::Result GoRelativToTargetCommand::exec(){
     }
 
     RCLCPP_INFO(drone_control_->get_logger(),
-		"GoRelativToTargetCommand: d=%f d(%f, %f, %f) t(%f, %f, %f), v(%f, %f, %f)",
+		"GoRelativeToTargetCommand: d=%f d(%f, %f, %f) t(%f, %f, %f), v(%f, %f, %f)",
 		dist,
         offset->x_,offset->y_,offset->z_,
         tx, ty, tz,
@@ -506,7 +492,7 @@ CenterBellowTargetCommandQueue::CenterBellowTargetCommandQueue(
     	: CommandQueue(drone_control, "CenterBellowTargetCommandQueue", reset_on_complete),
     	targeter_(targeter), distance_below_(distance_below), max_speed_(max_speed){
 
-		RCLCPP_WARN(drone_control_->get_logger(), "%s: addeding commands", name_.c_str());
+		RCLCPP_WARN(drone_control_->get_logger(), "%s: adding commands", name_.c_str());
 
         //offboard
         add_command(std::make_shared<GotoCommand>(
@@ -521,34 +507,34 @@ CenterBellowTargetCommandQueue::CenterBellowTargetCommandQueue(
 
         // center x and y
         add_command(std::make_shared<GotoCommand>(
-                    std::make_shared<GoRelativToTargetCommand>(
+                    std::make_shared<GoRelativeToTargetCommand>(
             			drone_control,
             			targeter_,
             			std::make_shared<OffsetToTarget>(0., 0., z, 0., 0.),
             			0.04,
             			max_speed_,
-			            GoRelativToTargetCommand::DesiredType::Equal,
-            			GoRelativToTargetCommand::DesiredType::Equal,
-            			GoRelativToTargetCommand::DesiredType::Ignore,
-            			GoRelativToTargetCommand::DesiredType::Ignore,
-            			GoRelativToTargetCommand::DesiredType::Ignore),
-                    "GoRelativToTargetCommand",
+			            GoRelativeToTargetCommand::DesiredType::Equal,
+            			GoRelativeToTargetCommand::DesiredType::Equal,
+            			GoRelativeToTargetCommand::DesiredType::Ignore,
+            			GoRelativeToTargetCommand::DesiredType::Ignore,
+            			GoRelativeToTargetCommand::DesiredType::Ignore),
+                    "GoRelativeToTargetCommand",
             		1, 1, 0, 0, true, true));
 
-        // fly to dedsired hight
+        // fly to desired height
         add_command(std::make_shared<GotoCommand>(
-                    std::make_shared<GoRelativToTargetCommand>(
+                    std::make_shared<GoRelativeToTargetCommand>(
             			drone_control,
             			targeter_,
             			std::make_shared<OffsetToTarget>(0., 0., distance_below_, 0., 0.),
             			0.04,
             			max_speed_,
-			            GoRelativToTargetCommand::DesiredType::Equal,
-            			GoRelativToTargetCommand::DesiredType::Equal,
-            			GoRelativToTargetCommand::DesiredType::Equal,
-            			GoRelativToTargetCommand::DesiredType::Ignore,
-            			GoRelativToTargetCommand::DesiredType::Ignore),
-                    "GoRelativToTargetCommand",
+			            GoRelativeToTargetCommand::DesiredType::Equal,
+            			GoRelativeToTargetCommand::DesiredType::Equal,
+            			GoRelativeToTargetCommand::DesiredType::Equal,
+            			GoRelativeToTargetCommand::DesiredType::Ignore,
+            			GoRelativeToTargetCommand::DesiredType::Ignore),
+                    "GoRelativeToTargetCommand",
             		1, 1, 0, 0, true, true));
 
         RCLCPP_WARN(drone_control_->get_logger(), "%s: added commands", name_.c_str());
@@ -563,7 +549,7 @@ MagnetDockAtTargetCommandQueue::MagnetDockAtTargetCommandQueue(
     	: CommandQueue(drone_control, "MagnetDockAtTargetCommandQueue", reset_on_complete),
     	magnet_client_(magnet_client), targeter_(targeter), max_speed_(max_speed){
 
-		RCLCPP_WARN(drone_control_->get_logger(), "%s: addeding commands", name_.c_str());
+		RCLCPP_WARN(drone_control_->get_logger(), "%s: adding commands", name_.c_str());
 
         //offboard
         add_command(std::make_shared<GotoCommand>(
@@ -572,7 +558,7 @@ MagnetDockAtTargetCommandQueue::MagnetDockAtTargetCommandQueue(
                     "OffboardCommand",
             		1, 0, 0, 0, true, true));
 
-        // start to ready manget
+        // start to ready magnet
         add_command(std::make_shared<GotoCommand>(
                     	std::make_shared<MagnetCommand>(
                     	drone_control_,
@@ -667,7 +653,7 @@ MagnetDockAtTargetCommandQueue::MagnetDockAtTargetCommandQueue(
 
 		//go to position bellow target, if docking failed
 		add_command(std::make_shared<GotoCommand>(
-			std::make_shared<GoRelativToTargetCommand>(
+			std::make_shared<GoRelativeToTargetCommand>(
 				drone_control_,
 				std::make_shared<CalculateOffsetToGlobalPoseCommand>(
 					drone_control_,
@@ -677,12 +663,12 @@ MagnetDockAtTargetCommandQueue::MagnetDockAtTargetCommandQueue(
 				std::make_shared<OffsetToTarget>(0., 0., 0., 0., 0.),
 				0.04,
 				max_speed_,
-				GoRelativToTargetCommand::DesiredType::Equal,
-				GoRelativToTargetCommand::DesiredType::Equal,
-				GoRelativToTargetCommand::DesiredType::Equal,
-				GoRelativToTargetCommand::DesiredType::Ignore,
-				GoRelativToTargetCommand::DesiredType::Ignore),
-			"GoRelativToTargetCommand",
+				GoRelativeToTargetCommand::DesiredType::Equal,
+				GoRelativeToTargetCommand::DesiredType::Equal,
+				GoRelativeToTargetCommand::DesiredType::Equal,
+				GoRelativeToTargetCommand::DesiredType::Ignore,
+				GoRelativeToTargetCommand::DesiredType::Ignore),
+			"GoRelativeToTargetCommand",
 			3, 1, 0, 0, true, true
 		));
 
@@ -705,15 +691,15 @@ MagnetDockAtTargetCommandQueue::MagnetDockAtTargetCommandQueue(
         RCLCPP_WARN(drone_control_->get_logger(), "%s: added commands", name_.c_str());
 }
 
-MagnetTakedownCommandQueue::MagnetTakedownCommandQueue(
+MagnetDetachCommandQueue::MagnetDetachCommandQueue(
 	std::shared_ptr<DroneControl> drone_control,
 	std::shared_ptr<MagnetServiceClient> magnet_client,
 	const double max_speed,
 	const bool reset_on_complete)
-    	: CommandQueue(drone_control, "MagnetTakedownCommandQueue", reset_on_complete),
+    	: CommandQueue(drone_control, "MagnetDetachCommandQueue", reset_on_complete),
     	magnet_client_(magnet_client), max_speed_(max_speed){
 
-		RCLCPP_WARN(drone_control_->get_logger(), "%s: addeding commands", name_.c_str());
+		RCLCPP_WARN(drone_control_->get_logger(), "%s: adding commands", name_.c_str());
 
     	//offboard
         add_command(std::make_shared<GotoCommand>(
@@ -796,7 +782,7 @@ MagnetTakedownCommandQueue::MagnetTakedownCommandQueue(
 
 
 		add_command(std::make_shared<GotoCommand>(
-			std::make_shared<GoRelativToTargetCommand>(
+			std::make_shared<GoRelativeToTargetCommand>(
 				drone_control_,
 				std::make_shared<CalculateOffsetToGlobalPoseCommand>(
 					drone_control_,
@@ -806,12 +792,12 @@ MagnetTakedownCommandQueue::MagnetTakedownCommandQueue(
 				std::make_shared<OffsetToTarget>(0., 0., 0., 0., 0.),
 				0.04,
 				max_speed_,
-				GoRelativToTargetCommand::DesiredType::Equal,
-				GoRelativToTargetCommand::DesiredType::Equal,
-				GoRelativToTargetCommand::DesiredType::Equal,
-				GoRelativToTargetCommand::DesiredType::Ignore,
-				GoRelativToTargetCommand::DesiredType::Ignore),
-			"GoRelativToTargetCommand",
+				GoRelativeToTargetCommand::DesiredType::Equal,
+				GoRelativeToTargetCommand::DesiredType::Equal,
+				GoRelativeToTargetCommand::DesiredType::Equal,
+				GoRelativeToTargetCommand::DesiredType::Ignore,
+				GoRelativeToTargetCommand::DesiredType::Ignore),
+			"GoRelativeToTargetCommand",
 			1, 1, 0, 0, true, true
 		));
 
