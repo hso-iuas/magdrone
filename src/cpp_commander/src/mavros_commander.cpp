@@ -61,12 +61,12 @@ void MavrosCommander::init_services(){
 
             auto offset = std::make_shared<OffsetToTarget>(0, 0, 0, 0, 0);
             this->cmdQueue_.add_command(std::make_shared<GotoCommand>(
-                std::make_shared<MagnetTakedownCommandQueue>(
+                std::make_shared<MagnetDetachCommandQueue>(
                       this->drone_control_,
                       this->magnet_client_,
                       request->max_speed
                 ),
-                "MagnetTakedownCommandQueue")
+                "MagnetDetachCommandQueue")
             );
             RCLCPP_INFO(node_->get_logger(), "MavrosCommander: added takedown cmd");
             response->success = true;
