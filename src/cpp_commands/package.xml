@@ -3,9 +3,9 @@
 <package format="3">
   <name>cpp_commands</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="valwerner2@gmail.com">valwe</maintainer>
-  <license>TODO: License declaration</license>
+  <description>Commands for flight logic with FSM for docking and detachment</description>
+  <maintainer email="valwerner2@gmail.com">Valentin Werner</maintainer>
+  <license>Apache 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <depend>rclcpp</depend>

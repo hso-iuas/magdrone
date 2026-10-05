@@ -3,8 +3,8 @@
 <package format="3">
   <name>cpp_commander</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="valwerner2@gmail.com">valwe</maintainer>
+  <description>Commander node for flight logic</description>
+  <maintainer email="valwerner2@gmail.com">Valentin Werner</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
