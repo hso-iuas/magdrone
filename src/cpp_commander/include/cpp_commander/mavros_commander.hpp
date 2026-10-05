@@ -14,7 +14,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include "cpp_commands/commands.hpp"
 
-#include "custom_services/srv/center_below_target.hpp"
 #include "custom_services/srv/land_target.hpp"
 #include "custom_services/srv/takedown.hpp"
 #include "rclcpp/rclcpp.hpp"
