@@ -10,7 +10,7 @@ MagnetServiceClient::MagnetServiceClient(rclcpp::Node* node) :
 
 DroneControl::Result MagnetServiceClient::make_request(Direction direction){
     if(!request_active_){
-        auto request = this->instanciate_request();
+        auto request = this->instantiate_request();
         request->direction = (int)direction;
 
         return this->send_request(request);

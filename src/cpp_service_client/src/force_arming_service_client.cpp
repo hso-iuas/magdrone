@@ -15,7 +15,7 @@ DroneControl::Result ForceArmingServiceClient::make_request(bool arm){
             RCLCPP_INFO(node_->get_logger(), "Disarming...");
         }
 
-        auto request = this->instanciate_request();
+        auto request = this->instantiate_request();
         request->command = mavros_msgs::msg::CommandCode::COMPONENT_ARM_DISARM;
 
         if(arm){

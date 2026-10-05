@@ -9,7 +9,7 @@ SetModeServiceClient::SetModeServiceClient(rclcpp::Node* node) :
 
 DroneControl::Result SetModeServiceClient::make_request(const std::string& mode) {
     if(!request_active_){
-        auto request = this->instanciate_request();
+        auto request = this->instantiate_request();
         request->custom_mode = mode;
         return this->send_request(request);
     }
