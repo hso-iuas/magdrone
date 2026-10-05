@@ -14,10 +14,8 @@
 #include <mavros_msgs/msg/attitude_target.hpp>
 #include <tf2/utils.h>
 
-#include "cpp_service_client/arming_service_client.hpp"
 #include "cpp_service_client/force_arming_service_client.hpp"
 #include "cpp_service_client/set_mode_service_client.hpp"
-#include "cpp_service_client/land_service_client.hpp"
 #include "cpp_velocity_controller/pid_velocity_controller.hpp"
 #include "cpp_drone_control_interface/drone_control.hpp"
 
@@ -79,7 +77,6 @@ class MavrosDroneControl : public DroneControl {
         rclcpp::Subscription<mavros_msgs::msg::ExtendedState>::SharedPtr ext_state_sub_;
 
         std::shared_ptr<ForceArmingServiceClient> force_arming_client_;
-        std::shared_ptr<ArmingServiceClient> arming_client_;
         std::shared_ptr<SetModeServiceClient> set_mode_client_;
 
         std::shared_ptr<XyzVelocityController> vel_controller_ = nullptr;

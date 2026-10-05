@@ -139,7 +139,6 @@ void MavrosDroneControl::init_services() {
     RCLCPP_INFO(get_logger(), "Creating clients");
 
     force_arming_client_ = std::make_shared<ForceArmingServiceClient>(node_);
-    arming_client_ = std::make_shared<ArmingServiceClient>(node_);
     set_mode_client_ = std::make_shared<SetModeServiceClient>(node_);
 }
 
