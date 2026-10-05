@@ -1,0 +1,4 @@
+int32 direction
+---
+bool success
+int32 magnet_state

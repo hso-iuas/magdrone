@@ -1,0 +1,4 @@
+string tf2_target
+float64 max_speed 0.1  # default max_speed
+---
+bool success
