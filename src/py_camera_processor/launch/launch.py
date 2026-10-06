@@ -36,6 +36,5 @@ def generate_launch_description():
 
     return LaunchDescription([
         set_python_path,
-        sim_mode_arg,
         camera_processor_node
     ])

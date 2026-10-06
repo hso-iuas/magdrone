@@ -2,7 +2,7 @@ import os
 from glob import glob
 from setuptools import find_packages, setup
 
-package_name = 'magdrone_bringup'
+package_name = 'bringup'
 
 setup(
     name=package_name,

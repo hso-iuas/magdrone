@@ -94,8 +94,8 @@ def generate_launch_description():
                 arguments=[
                     '0', '0', '0.14',  # x, y, z
                     '0', '0', '0',  # yaw, pitch, roll (in radians)
-                    'magdrone_top_plate',  # parent frame
-                    'magnetTip'  # child frame
+                    'drone_top_plate',  # parent frame
+                    'magnet_tip'  # child frame
                 ],
             ),
             #SCT
