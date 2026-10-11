@@ -46,7 +46,7 @@ source install/setup.bash
 
 Now the bringup launch-file can be used:
 ```bash
-ros2 bringup launch.py
+ros2 launch bringup launch.py
 ```
 
 
@@ -68,5 +68,5 @@ For other markers change the number in the service call.
 
 ## Detaching:
 ```bash
-  ros2 service call magdrone/commander/takedown custom_services/srv/Takedown ""
+  ros2 service call magdrone/commander/takedown custom_services/srv/Takedown "{}"
 ```
