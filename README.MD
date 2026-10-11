@@ -1,8 +1,6 @@
 # magdock
 Autonomous Drone with a magnet, so it can attach to metal.
 
-[Videos of it working](https://drive.google.com/drive/folders/1dibxdaSVwbIMsM3NwXmNaIzQBTG8TQRz?usp=sharing)
-
 # Contents
 - [Install](#install)
 - [Build](#build)
