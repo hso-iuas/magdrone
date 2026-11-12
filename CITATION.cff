@@ -1,11 +1,11 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "Autonomous vision-guided magnetic docking for multirotor UAVs"
+title: "Zero-Power Magnetic Perching and Vision-Guided Autonomous Docking for Multirotor UAV"
 type: software
 license: Apache-2.0
 repository-code: "https://github.com/hso-iuas/magdrone"
 version: "1.0.0"
-date-released: "YYYY-MM-DD"
+date-released: "2026-11-12"
 authors:
   - family-names: Werner
     given-names: Valentin
