@@ -3,7 +3,7 @@
 <package format="3">
   <name>py_magnet</name>
   <version>0.0.0</version>
-  <description>ROS2 Node that controls the magnet, based on the Script by Martin Oberle</description>
+  <description>ROS2 Node that controls the magnet, based on the Script by Marco Oberle</description>
   <maintainer email="valwerner2@gmail.com">Valentin Werner</maintainer>
   <license>Apache-2.0</license>
 

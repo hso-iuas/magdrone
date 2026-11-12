@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Autonomous vision-guided magnetic docking for multirotor UAVs"
+type: software
+license: Apache-2.0
+repository-code: "https://github.com/hso-iuas/magdrone"
+version: "1.0.0"
+date-released: "YYYY-MM-DD"
+authors:
+  - family-names: Werner
+    given-names: Valentin
+    affiliation: "Institute for Unmanned Aerial Systems, Hochschule Offenburg"
+  - family-names: Oberle
+    given-names: Marco
+    affiliation: "Institute for Unmanned Aerial Systems, Hochschule Offenburg"
+  - family-names: Giel
+    given-names: Dominik
+    affiliation: "Institute for Unmanned Aerial Systems, Hochschule Offenburg"
+  - family-names: Kreilos
+    given-names: Tobias
+    affiliation: "Institute for Unmanned Aerial Systems, Hochschule Offenburg"
+keywords:
+  - UAV
+  - perching
+  - magnetic docking
+  - ROS 2
+  - ArUco
+  - PX4

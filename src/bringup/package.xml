@@ -5,7 +5,7 @@
   <version>0.0.0</version>
   <description>Brings up drone</description>
   <maintainer email="valwerner2@gmail.com">Valentin Werner</maintainer>
-  <license>Apache 2.0</license>
+  <license>Apache-2.0</license>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

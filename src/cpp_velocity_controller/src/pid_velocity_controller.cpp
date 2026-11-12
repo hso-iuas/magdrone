@@ -34,7 +34,7 @@ double PidVelocityController::next_velocity(double dist_target){
     // Integral component
     vec_i_[current_write_position_] = filtered_dist_target_;
     current_write_position_ = (current_write_position_ + 1) % i_vec_length_;
-    i = ki_ * ta_ * std::accumulate(vec_i_.begin(), vec_i_.end(), 0);
+    i = ki_ * ta_ * std::accumulate(vec_i_.begin(), vec_i_.end(), 0.0);
 
     // Derivative component
     d = kd_ / ta_ * (filtered_dist_target_ - last_dist_target_);
