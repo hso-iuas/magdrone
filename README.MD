@@ -1,4 +1,4 @@
-# magdock
+# Zero-Power Magnetic Perching and Vision-Guided Autonomous Docking for Multirotor UAV
 Autonomous Drone with a magnet, so it can attach to metal.
 
 # Contents
